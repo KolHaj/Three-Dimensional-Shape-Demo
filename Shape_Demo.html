@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<head>
+<meta charset="UTF-8">
+<title>3D Shape Demo</title>
+<style>
+</style>
+<script src="three.js"></script>
+<script>
+
+/*
+ * File: Shape_Demo.html
+ * Author: Kolger Hajati
+ * Date: November 25, 2020
+ * Purpose: Holds javascript functions, html, and style
+ * that work with the three.js library
+ */
+
+"use strict";
+
+var scene, camera, renderer;  // Three.js rendering basics.
+
+var canvas;  // The canvas on which the image is rendered.
+
+var model;   // Contains the visible objects in the scene, but
+             // not the lights or camera.  The model can be
+			 // rotated using the keyboard. 
+
+//Shape Variables            
+var cubeNode;
+var cube;
+var polyNodeOne;
+var polyhedronOne;
+var polyNodeTwo;
+var polyhedronTwo;
+var coneOne;
+var coneNodeOne;
+var coneTwo;
+var coneNodeTwo;
+var torusKnotOne;
+var torusNodeOne;
+var torusKnotTwo;
+var torusNodeTwo;
+//Light Variables
+var blueLight
+var redLight
+var greenLight
+var viewpointLight
+//Function Variables
+var dropChoiceS = 3;
+var dropChoiceA = 1;
+var animating = false;  // This is set to true when an animation is running.
+
+
+/*  Create the scene graph.  This function is called once, as soon as the page loads.
+ *  The renderer has already been created before this function is called.
+ */
+function createWorld() {
+    renderer.setClearColor( 0x444444 );  // Set background color (0x444444 is dark gray).
+	scene = new THREE.Scene();
+	
+	// create a camera, sitting on the positive z-axis.  The camera is not part of the scene.
+	camera = new THREE.PerspectiveCamera(95, canvas.width/canvas.height, 1, 30);
+	camera.position.z = 15;
+	
+    // create some lights and add them to the scene.
+    scene.add( new THREE.DirectionalLight( 0xffffff, 0.4 ) ); // dim light shining from above
+
+    //Blue light cords and details
+    blueLight = new THREE.DirectionalLight(0x1138f7, 3);
+    blueLight.position.set(20, 10, 5);
+    scene.add(blueLight);
+    //Red light cords and details
+    redLight = new THREE.DirectionalLight(0xf71124, 3);
+    redLight.position.set(-20, 10, 5);
+    scene.add(redLight);
+    //Green light cords and details
+    greenLight = new THREE.DirectionalLight(0x44db47, 1);
+    greenLight.position.set(0, -20, 5);
+    scene.add(greenLight);
+    //View light cords and details
+	viewpointLight = new THREE.DirectionalLight( 0xffffff, 0.4);  // a light to shine in the direction the camera faces
+	viewpointLight.position.set(0,0,1);  // shines down the z-axis
+	scene.add(viewpointLight);
+	
+	// create the model 
+	model = new THREE.Object3D();
+
+    //Cube Shape Data
+    cube = new THREE.Mesh( 
+        new THREE.BoxGeometry(4.5,4.5,4.5),
+        new THREE.MeshLambertMaterial({
+            color: 0xffffff,
+            shininess: 100
+        })
+    );
+    cube.position.x = 0;
+    cube.position.y = 0;
+    cubeNode = new THREE.Object3D();
+    cubeNode.add(cube);
+    model.add(cubeNode);
+    cubeNode.scale.set(1, 1, 1)
+
+    //Polyhedron One Shape Data
+    var vertCube = [
+        -1,-1,-1,    1,-1,-1,    
+        1, 1,-1,    -1, 1,-1,
+        -1,-1, 1,    1,-1, 1,    
+        1, 1, 1,    -1, 1, 1,
+    ];
+    var indFace = [
+        2,1,0,    0,3,2,
+        0,4,7,    7,3,0,
+        0,1,5,    5,4,0,
+        1,2,6,    6,5,1,
+        2,3,7,    7,6,2,
+        4,5,6,    6,7,4
+    ];
+    var geoPolyOne = new THREE.PolyhedronGeometry( vertCube, indFace, 6, 1 );
+    var matPolyOne = new THREE.MeshLambertMaterial({
+            color: 0x166bf5,
+	        shininess: 100
+    })
+    polyhedronOne = new THREE.Mesh(geoPolyOne, matPolyOne)
+    polyhedronOne.position.x = 30;
+    polyhedronOne.position.y = 30;
+    polyNodeOne = new THREE.Object3D();
+    polyNodeOne.add(polyhedronOne);
+    model.add(polyNodeOne);
+    polyNodeOne.scale.set(.20, .20, .20)
+
+    //Polyhedron Two Shape Data
+    var geoPolyTwo = new THREE.PolyhedronGeometry( vertCube, indFace, 6, 1 );
+    var matPolyTwo = new THREE.MeshLambertMaterial({
+            color: 0xf3fa1e,
+	        shininess: 100
+    })
+    polyhedronTwo = new THREE.Mesh(geoPolyTwo, matPolyTwo)
+    polyhedronTwo.position.x = -30;
+    polyhedronTwo.position.y = -30;
+    polyNodeTwo = new THREE.Object3D();
+    polyNodeTwo.add(polyhedronTwo);
+    model.add(polyNodeTwo);
+    polyNodeTwo.scale.set(.20, .20, .20)
+
+    //Cone One Shape Data
+    var geoConeOne = new THREE.CylinderGeometry(0, 30, 69, 4, 1, false);
+    var matConeOne = new THREE.MeshLambertMaterial({
+            color: 0x3894c9,
+	        shininess: 100
+    })
+    coneOne = new THREE.Mesh(geoConeOne, matConeOne);
+    coneOne.position.x = -140;
+    coneOne.position.y = 140;
+    coneNodeOne = new THREE.Object3D();
+    coneNodeOne.add(coneOne);
+    if (dropChoiceS >= 4){
+        model.add(coneNodeOne);
+    }
+    coneNodeOne.scale.set(.05, .05, .05)
+
+    //Cone Two Shape Data
+    var geoConeTwo = new THREE.CylinderGeometry(0, 30, 69, 4, 1, false);
+    var matConeTwo = new THREE.MeshLambertMaterial({
+            color: 0x75fa92,
+	        shininess: 100
+    })
+    coneTwo = new THREE.Mesh(geoConeTwo, matConeTwo);
+    coneTwo.position.x = 140;
+    coneTwo.position.y = -140;
+    coneNodeTwo = new THREE.Object3D();
+    coneNodeTwo.add(coneTwo);
+    if (dropChoiceS >= 5){
+        model.add(coneNodeTwo);
+    }
+    coneNodeTwo.scale.set(.05, .05, .05)
+
+	model.rotation.set(0.1,0,0); // Tip it forward a bit, so we're not looking at it edge-on.
+	scene.add(model);
+
+    //Torus Knot One Shape Data
+    var geoTorusOne = new THREE.TorusKnotGeometry(15, 3, 100, 16);
+    var matTorusOne = new THREE.MeshLambertMaterial({
+            color: 0x75fa92,
+	        shininess: 100
+    })
+    torusKnotOne = new THREE.Mesh(geoTorusOne, matTorusOne);
+    torusKnotOne.position.x = 210;
+    torusKnotOne.position.y = 0;
+    torusNodeOne = new THREE.Object3D();
+    torusNodeOne.add(torusKnotOne);
+    if (dropChoiceS >= 6){
+        model.add(torusNodeOne);
+    }
+    torusNodeOne.scale.set(.07, .07, .07)
+
+    //Torus Knot One Shape Data
+    var geoTorusTwo = new THREE.TorusKnotGeometry(15, 3, 100, 16);
+    var matTorusTwo = new THREE.MeshLambertMaterial({
+            color: 0x75fa92,
+	        shininess: 100
+    })
+    torusKnotTwo = new THREE.Mesh(geoTorusTwo, matTorusTwo);
+    torusKnotTwo.position.x = -210;
+    torusKnotTwo.position.y = 0;
+    torusNodeTwo = new THREE.Object3D();
+    torusNodeTwo.add(torusKnotTwo);
+    if (dropChoiceS == 7){
+        model.add(torusNodeTwo);
+    }
+    torusNodeTwo.scale.set(.07, .07, .07)
+
+	model.rotation.set(0.1,0,0); // Tip it forward a bit, so we're not looking at it edge-on.
+	scene.add(model);
+}
+
+
+/*  Render the scene.  This is called for each frame of the animation.
+ */
+function render() {
+    renderer.render(scene, camera);
+}
+
+
+/*  When an animation is in progress, this function is called just before rendering each
+ *  frame of the animation, to make any changes necessary in the scene graph to prepare
+ *  for that frame.
+ */
+function updateForFrame() {
+    if (dropChoiceA == 1){
+        //Cube
+        cubeNode.rotation.y += 0.03;
+        //Poly One
+        polyNodeOne.rotation.y += 0.02;
+        //Poly Two
+        polyNodeTwo.rotation.y += 0.02;
+        //Cone One
+        coneNodeOne.rotation.y -= 0.02;
+        //Cone Two
+        coneNodeTwo.rotation.y -= 0.02;
+        //Torus Knot One
+        torusNodeOne.rotation.y -=0.02;
+        //Torus Knot Two
+        torusNodeTwo.rotation.y +=0.02;
+    }
+    else if (dropChoiceA == 2) {
+        cubeNode.rotation.x += 0.03;
+        //Poly One
+        polyNodeOne.rotation.x += 0.02;
+        //Poly Two
+        polyNodeTwo.rotation.x += 0.02;
+        //Cone One
+        coneNodeOne.rotation.x -= 0.02;
+        //Cone Two
+        coneNodeTwo.rotation.x -= 0.02;
+        //Torus Knot One
+        torusNodeOne.rotation.x -=0.02;
+        //Torus Knot Two
+        torusNodeTwo.rotation.x +=0.02;
+    }
+    else if (dropChoiceA == 3) {
+        //Cube
+        cubeNode.rotation.y += 0.03;
+        cubeNode.rotation.x += 0.03;
+        //Poly One
+        polyNodeOne.rotation.y += 0.02;
+        polyNodeOne.rotation.x += 0.02;
+        //Poly Two
+        polyNodeTwo.rotation.y += 0.02;
+        polyNodeTwo.rotation.x += 0.02;
+        //Cone One
+        coneNodeOne.rotation.y -= 0.02;
+        coneNodeOne.rotation.x -= 0.02;
+        //Cone Two
+        coneNodeTwo.rotation.y -= 0.02;
+        coneNodeTwo.rotation.x -= 0.02;
+        //Torus Knot One
+        torusNodeOne.rotation.y -=0.02;
+        torusNodeOne.rotation.x -=0.02;
+        //Torus Knot Two
+        torusNodeTwo.rotation.y +=0.02;
+        torusNodeTwo.rotation.x +=0.02;
+    }
+}
+
+
+//--------------------------- animation support -----------------------------------
+
+/* This function runs the animation by calling updateForFrame() then calling render().
+ * Finally, it arranges for itself to be called again to do the next frame.  When the
+ * value of animating is set to false, this function does not schedule the next frame,
+ * so the animation stops.
+ */
+function doFrame() {
+    if (animating) {
+        updateForFrame();
+        render();
+        requestAnimationFrame(doFrame); 
+	}
+}
+
+
+/* Responds when the setting of the "Animate" checkbox is changed.  This
+ * function will start or stop the animation, depending on its setting.
+ */
+function doAnimateCheckbox() {
+    var anim = document.getElementById("animate").checked;
+	if (anim != animating) {
+		animating = anim;
+		if (animating) {
+			doFrame();
+		}
+	}
+}
+
+
+
+//----------------------------- keyboard support ----------------------------------
+
+/*  Responds to user's key press.  Here, it is used to rotate the model.
+ */
+function doKey(event) {
+	var code = event.keyCode;
+	var rotated = true;
+	switch( code ) {
+	    case 37: model.rotation.y -= 0.03;  break;    // left arrow
+	    case 39: model.rotation.y +=  0.03; break;    // right arrow
+	    case 38: model.rotation.x -= 0.03;  break;    // up arrow
+	    case 40: model.rotation.x += 0.03;  break;    // down arrow
+	    case 33: model.rotation.z -= 0.03;  break;    // page up
+	    case 34: model.rotation.z += 0.03;  break;    // page down
+	    case 36: model.rotation.set(0.2,0,0); break;  // home
+	    default: rotated = false;
+	}
+	if (rotated) {
+		event.preventDefault();  // Prevent keys from scrolling the page.
+		if (!animating) { // (if an animation is running, no need for an extra render)
+			render();
+		}
+	}
+}
+
+
+
+//----------------------------------------------------------------------------------
+
+/**
+ *  This init() function is called when by the onload event when the document has loaded.
+ */
+function init() {
+	try {
+	    canvas = document.getElementById("glcanvas");
+		renderer = new THREE.WebGLRenderer( {
+		    canvas: canvas,
+		    antialias: true
+		} );
+	}
+	catch (e) {
+		document.getElementById("canvas-holder").innerHTML =
+		         "<h3><b>Sorry, WebGL is required but is not available.</b><h3>";
+		return;
+	}
+	document.addEventListener("keydown", doKey, false);
+    document.getElementById("animate").checked = false;
+    document.getElementById("animate").onchange = doAnimateCheckbox;
+    console.log(dropChoiceS);
+    console.log(dropChoiceA);
+	createWorld();
+	render();
+}
+
+</script>
+</head>
+<body onload="init()">
+
+<h2>3D Shape Demo</h2>
+
+<p><b>Use Arrow, PageUp, PageDown, and Home keys to rotate the model.</b></p>
+
+<p><label><input type="checkbox" id="animate">Animate</label>
+<form style="display: inline; padding-right: 2%;">
+    Select the number of shapes:
+    <select id="shapeSelect"  onchange="shapeTotal()">
+        <option value=3>3 Shapes</option>
+        <option value=4>4 Shapes</option>
+        <option value=5>5 Shapes</option>
+        <option value=6>6 Shapes</option>
+        <option value=7>7 Shapes</option>
+    </select>
+</form>
+<form style="display: inline;">
+    Select the animation type:
+    <select id="animateSelect"  onchange="shapeAnimation()">
+        <option value=1>Animation One</option>
+        <option value=2>Animation Two</option>
+        <option value=3>Animation Three</option>
+    </select>
+</form></p>
+
+<script>
+    //Drop down function for for shape total
+    function shapeTotal() {
+      dropChoiceS = document.getElementById("shapeSelect").value;
+      console.log(dropChoiceS);
+      createWorld();
+      render();
+    }
+    //Drop down function for animation selection
+    function shapeAnimation() {
+      dropChoiceA = document.getElementById("animateSelect").value;
+      console.log(dropChoiceA);
+      createWorld();
+      render();
+    }
+</script>
+
+<div id="canvas-holder">
+<canvas id="glcanvas" width="640" height="480"></canvas>
+</div>
+
+</body>
+</html>
