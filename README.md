@@ -7,7 +7,7 @@ the 3D scene.
 ## Getting Started
 
 The project is built using JavaScript with HTML/CSS so using any IDE that supports JavaScript will work and can be used edit and to run in the desktop. 
-For the application to work you will just need to open the "Christmas_Forest.html" in the your browser of choice.
+For the application to work you will just need to open the "Shape_Demo.html" in the your browser of choice.
 
 ### Prerequisites
 
@@ -16,7 +16,7 @@ or, Visual Studio Code
 
 ### Installing
 
-Clone the project into your folder, the main file is the "Christmas_Forest.html" so opening that in a browser with the other files will open
+Clone the project into your folder, the main file is the "Shape_Demo.html" so opening that in a browser with the other files will open
 the page automatically and allow all the functionality to work.
 
 ## Running the tests
